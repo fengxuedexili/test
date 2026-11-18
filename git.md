@@ -5,14 +5,56 @@
 | 项 | 值 |
 |---|---|
 | 仓库位置 | `D:\VUE-WorkSpace\2027\site`（本地） |
-| 分支 | `main` |
-| 提交 | `1af3392` 初始化工程（Day 1–12 + M1）<br>`6f8970d` 文档补充 |
-| 标签 | `v0.1.0` |
-| 远端 | **无**（`git remote -v` 为空，尚未推送） |
+| 远端 | **origin** → `https://github.com/fengxuedexili/test.git` |
+| 分支 | `main`（跟踪 `origin/main`） |
+| 本地 HEAD | `fde2ee2` docs: 增加 Git 状态与推送指南 |
+| 远端 HEAD | `fde2ee2`（与本地一致） |
+| 标签 | `v0.1.0`（已推送，指向 `1af3392`） |
 | 工作区 | clean |
 | 跟踪文件 | 793 个（无 `target/dist/node_modules/logs/uploadPath`） |
+| 本仓库代理 | `http.proxy` / `https.proxy` = `http://127.0.0.1:7897`（跟随系统 IE 代理） |
+| 凭据 | Windows 凭据管理器已保存 GitHub HTTPS 凭据（用户 `fengxuedexili`）；仓库内无 Token/密码 |
 
-> 结论：代码只在本机，**还没有推送到任何远程仓库**。下面任选一种远端，按对应指令执行即可；推送需要你的账号/密钥，我无法代填凭据。
+> 状态：**已推送成功**。仓库页面：https://github.com/fengxuedexili/test
+
+### 本次实际执行的指令（按顺序）
+
+```powershell
+cd D:\VUE-WorkSpace\2027\site
+```
+
+```powershell
+git remote add origin https://github.com/fengxuedexili/test.git
+```
+
+```powershell
+git config http.proxy http://127.0.0.1:7897
+```
+
+```powershell
+git config https.proxy http://127.0.0.1:7897
+```
+
+```powershell
+git ls-remote --heads origin
+```
+
+```powershell
+git push -u origin main
+```
+
+```powershell
+git push origin --tags
+```
+
+```powershell
+git ls-remote --heads origin
+```
+
+```powershell
+git ls-remote --tags origin
+```
+
 
 ## 1. 推送前检查（先跑这几条）
 
@@ -258,6 +300,36 @@ git ls-files | ForEach-Object { Get-Item -LiteralPath $_ } | Sort-Object Length 
 **6) 误提交了密码/密钥**
 
 1) 立即在平台上作废并更换该密码/密钥；2) 用 `git filter-repo` 或 BFG 从历史移除；3) 重新推送并通知协作者重新克隆。
+
+**7) 代理导致 push / ls-remote 失败（Connection was reset）**
+
+查看当前代理：
+
+```powershell
+git config --get http.proxy
+```
+
+设置代理（本仓库已按系统 IE 代理配置）：
+
+```powershell
+git config http.proxy http://127.0.0.1:7897
+```
+
+```powershell
+git config https.proxy http://127.0.0.1:7897
+```
+
+关闭代理或换网络后，删除本仓库配置：
+
+```powershell
+git config --unset http.proxy
+```
+
+```powershell
+git config --unset https.proxy
+```
+
+> 判断方法：浏览器能打开 GitHub，但 `git ls-remote` 报 `Recv failure: Connection was reset`，通常是 Git 未走系统代理。
 
 ## 9. 日常提交流程
 

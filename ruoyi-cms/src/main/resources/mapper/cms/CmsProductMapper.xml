@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsProductMapper">
+
+    <resultMap type="CmsProduct" id="CmsProductResult">
+        <id property="productId" column="product_id" />
+        <result property="categoryId" column="category_id" />
+        <result property="seriesId" column="series_id" />
+        <result property="model" column="model" />
+        <result property="name" column="name" />
+        <result property="subtitle" column="subtitle" />
+        <result property="cover" column="cover" />
+        <result property="images" column="images" />
+        <result property="detailImages" column="detail_images" />
+        <result property="videoUrl" column="video_url" />
+        <result property="sellingPoints" column="selling_points" />
+        <result property="paramsJson" column="params" />
+        <result property="downloads" column="downloads" />
+        <result property="tags" column="tags" />
+        <result property="isRecommend" column="is_recommend" />
+        <result property="sort" column="sort" />
+        <result property="publishTime" column="publish_time" />
+        <result property="viewCount" column="view_count" />
+        <result property="status" column="status" />
+        <result property="delFlag" column="del_flag" />
+        <result property="seoTitle" column="seo_title" />
+        <result property="seoKeywords" column="seo_keywords" />
+        <result property="seoDescription" column="seo_description" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+        <result property="categoryName" column="category_name" />
+    </resultMap>
+
+    <sql id="selectProductVo">
+        select p.product_id, p.category_id, p.series_id, p.model, p.name, p.subtitle, p.cover,
+               p.images, p.detail_images, p.video_url, p.selling_points, p.params, p.downloads, p.tags,
+               p.is_recommend, p.sort, p.publish_time, p.view_count, p.status, p.del_flag,
+               p.seo_title, p.seo_keywords, p.seo_description,
+               p.create_by, p.create_time, p.update_by, p.update_time, p.remark,
+               c.name as category_name
+        from cms_product p
+        left join cms_category c on c.category_id = p.category_id and c.del_flag = '0'
+    </sql>
+
+    <select id="selectProductList" parameterType="CmsProduct" resultMap="CmsProductResult">
+        <include refid="selectProductVo" />
+        <where>
+            p.del_flag = '0'
+            <if test="name != null and name != ''">AND p.name like concat('%', #{name}, '%')</if>
+            <if test="model != null and model != ''">AND p.model like concat('%', #{model}, '%')</if>
+            <if test="categoryId != null">AND p.category_id = #{categoryId}</if>
+            <if test="seriesId != null">AND p.series_id = #{seriesId}</if>
+            <if test="isRecommend != null and isRecommend != ''">AND p.is_recommend = #{isRecommend}</if>
+            <if test="status != null and status != ''">AND p.status = #{status}</if>
+        </where>
+        order by p.sort asc, p.product_id desc
+    </select>
+
+    <select id="selectSiteProductList" parameterType="CmsProduct" resultMap="CmsProductResult">
+        <include refid="selectProductVo" />
+        <where>
+            p.del_flag = '0' and p.status = '0'
+            and (p.publish_time is null or p.publish_time &lt;= sysdate())
+            <if test="categoryId != null">AND p.category_id = #{categoryId}</if>
+            <if test="categorySlug != null and categorySlug != ''">AND c.slug = #{categorySlug}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (p.name like concat('%', #{keyword}, '%')
+                     or p.model like concat('%', #{keyword}, '%')
+                     or p.subtitle like concat('%', #{keyword}, '%')
+                     or p.tags like concat('%', #{keyword}, '%'))
+            </if>
+        </where>
+        order by p.sort asc, p.product_id desc
+    </select>
+
+    <select id="selectProductById" parameterType="Long" resultMap="CmsProductResult">
+        <include refid="selectProductVo" />
+        where p.product_id = #{productId} and p.del_flag = '0'
+    </select>
+
+    <select id="selectRecommendProducts" resultMap="CmsProductResult">
+        <include refid="selectProductVo" />
+        where p.del_flag = '0' and p.status = '0' and p.is_recommend = '1'
+          and (p.publish_time is null or p.publish_time &lt;= sysdate())
+        order by p.sort asc, p.product_id desc
+        limit #{limit}
+    </select>
+
+    <select id="selectRelatedProducts" resultMap="CmsProductResult">
+        <include refid="selectProductVo" />
+        where p.del_flag = '0' and p.status = '0'
+          and (p.publish_time is null or p.publish_time &lt;= sysdate())
+          and p.category_id = #{categoryId} and p.product_id != #{excludeId}
+        order by p.sort asc, p.product_id desc
+        limit #{limit}
+    </select>
+
+    <insert id="insertProduct" parameterType="CmsProduct" useGeneratedKeys="true" keyProperty="productId">
+        insert into cms_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">category_id,</if>
+            <if test="seriesId != null">series_id,</if>
+            <if test="model != null">model,</if>
+            <if test="name != null">name,</if>
+            <if test="subtitle != null">subtitle,</if>
+            <if test="cover != null">cover,</if>
+            <if test="images != null">images,</if>
+            <if test="detailImages != null">detail_images,</if>
+            <if test="videoUrl != null">video_url,</if>
+            <if test="sellingPoints != null">selling_points,</if>
+            <if test="paramsJson != null">params,</if>
+            <if test="downloads != null">downloads,</if>
+            <if test="tags != null">tags,</if>
+            <if test="isRecommend != null">is_recommend,</if>
+            <if test="sort != null">sort,</if>
+            <if test="publishTime != null">publish_time,</if>
+            <if test="viewCount != null">view_count,</if>
+            <if test="status != null">status,</if>
+            <if test="seoTitle != null">seo_title,</if>
+            <if test="seoKeywords != null">seo_keywords,</if>
+            <if test="seoDescription != null">seo_description,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="seriesId != null">#{seriesId},</if>
+            <if test="model != null">#{model},</if>
+            <if test="name != null">#{name},</if>
+            <if test="subtitle != null">#{subtitle},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="images != null">#{images},</if>
+            <if test="detailImages != null">#{detailImages},</if>
+            <if test="videoUrl != null">#{videoUrl},</if>
+            <if test="sellingPoints != null">#{sellingPoints},</if>
+            <if test="paramsJson != null">#{paramsJson},</if>
+            <if test="downloads != null">#{downloads},</if>
+            <if test="tags != null">#{tags},</if>
+            <if test="isRecommend != null">#{isRecommend},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="publishTime != null">#{publishTime},</if>
+            <if test="viewCount != null">#{viewCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="seoTitle != null">#{seoTitle},</if>
+            <if test="seoKeywords != null">#{seoKeywords},</if>
+            <if test="seoDescription != null">#{seoDescription},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateProduct" parameterType="CmsProduct">
+        update cms_product
+        <set>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="seriesId != null">series_id = #{seriesId},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="subtitle != null">subtitle = #{subtitle},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="detailImages != null">detail_images = #{detailImages},</if>
+            <if test="videoUrl != null">video_url = #{videoUrl},</if>
+            <if test="sellingPoints != null">selling_points = #{sellingPoints},</if>
+            <if test="paramsJson != null">params = #{paramsJson},</if>
+            <if test="downloads != null">downloads = #{downloads},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="seoTitle != null">seo_title = #{seoTitle},</if>
+            <if test="seoKeywords != null">seo_keywords = #{seoKeywords},</if>
+            <if test="seoDescription != null">seo_description = #{seoDescription},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where product_id = #{productId}
+    </update>
+
+    <update id="deleteProductByIds" parameterType="Long">
+        update cms_product set del_flag = '2' where product_id in
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </update>
+
+    <update id="incrementViewCount" parameterType="Long">
+        update cms_product set view_count = view_count + 1 where product_id = #{productId}
+    </update>
+
+    <select id="countProductByCategoryId" parameterType="Long" resultType="int">
+        select count(1) from cms_product where category_id = #{categoryId} and del_flag = '0'
+    </select>
+
+</mapper>
+

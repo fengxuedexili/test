@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsBannerMapper">
+
+    <resultMap type="CmsBanner" id="CmsBannerResult">
+        <id property="bannerId" column="banner_id" />
+        <result property="position" column="position" />
+        <result property="mediaType" column="media_type" />
+        <result property="imageUrl" column="image_url" />
+        <result property="videoUrl" column="video_url" />
+        <result property="title" column="title" />
+        <result property="subtitle" column="subtitle" />
+        <result property="btnText" column="btn_text" />
+        <result property="linkUrl" column="link_url" />
+        <result property="sort" column="sort" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectBannerVo">
+        select banner_id, position, media_type, image_url, video_url, title, subtitle,
+               btn_text, link_url, sort, start_time, end_time, status,
+               create_by, create_time, update_by, update_time, remark
+        from cms_banner
+    </sql>
+
+    <select id="selectBannerList" parameterType="CmsBanner" resultMap="CmsBannerResult">
+        <include refid="selectBannerVo" />
+        <where>
+            <if test="position != null and position != ''">AND position = #{position}</if>
+            <if test="mediaType != null and mediaType != ''">AND media_type = #{mediaType}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+            <if test="title != null and title != ''">AND title like concat('%', #{title}, '%')</if>
+        </where>
+        order by sort asc, banner_id desc
+    </select>
+
+    <select id="selectSiteBanners" resultMap="CmsBannerResult">
+        <include refid="selectBannerVo" />
+        where position = #{position} and status = '0'
+          and (start_time is null or start_time &lt;= sysdate())
+          and (end_time is null or end_time &gt;= sysdate())
+        order by sort asc, banner_id asc
+    </select>
+
+    <select id="selectBannerById" parameterType="Long" resultMap="CmsBannerResult">
+        <include refid="selectBannerVo" />
+        where banner_id = #{bannerId}
+    </select>
+
+    <insert id="insertBanner" parameterType="CmsBanner" useGeneratedKeys="true" keyProperty="bannerId">
+        insert into cms_banner
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="position != null">position,</if>
+            <if test="mediaType != null">media_type,</if>
+            <if test="imageUrl != null">image_url,</if>
+            <if test="videoUrl != null">video_url,</if>
+            <if test="title != null">title,</if>
+            <if test="subtitle != null">subtitle,</if>
+            <if test="btnText != null">btn_text,</if>
+            <if test="linkUrl != null">link_url,</if>
+            <if test="sort != null">sort,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="position != null">#{position},</if>
+            <if test="mediaType != null">#{mediaType},</if>
+            <if test="imageUrl != null">#{imageUrl},</if>
+            <if test="videoUrl != null">#{videoUrl},</if>
+            <if test="title != null">#{title},</if>
+            <if test="subtitle != null">#{subtitle},</if>
+            <if test="btnText != null">#{btnText},</if>
+            <if test="linkUrl != null">#{linkUrl},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateBanner" parameterType="CmsBanner">
+        update cms_banner
+        <set>
+            <if test="position != null">position = #{position},</if>
+            <if test="mediaType != null">media_type = #{mediaType},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="videoUrl != null">video_url = #{videoUrl},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="subtitle != null">subtitle = #{subtitle},</if>
+            <if test="btnText != null">btn_text = #{btnText},</if>
+            <if test="linkUrl != null">link_url = #{linkUrl},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where banner_id = #{bannerId}
+    </update>
+
+    <delete id="deleteBannerByIds" parameterType="Long">
+        delete from cms_banner where banner_id in
+        <foreach item="bannerId" collection="array" open="(" separator="," close=")">
+            #{bannerId}
+        </foreach>
+    </delete>
+
+</mapper>

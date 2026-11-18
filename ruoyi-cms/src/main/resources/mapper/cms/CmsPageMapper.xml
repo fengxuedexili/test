@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsPageMapper">
+
+    <resultMap type="CmsPage" id="CmsPageResult">
+        <id property="pageId" column="page_id" />
+        <result property="slug" column="slug" />
+        <result property="title" column="title" />
+        <result property="blocks" column="blocks" />
+        <result property="status" column="status" />
+        <result property="seoTitle" column="seo_title" />
+        <result property="seoKeywords" column="seo_keywords" />
+        <result property="seoDescription" column="seo_description" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectPageVo">
+        select page_id, slug, title, blocks, status,
+               seo_title, seo_keywords, seo_description,
+               create_by, create_time, update_by, update_time, remark
+        from cms_page
+    </sql>
+
+    <select id="selectPageList" parameterType="CmsPage" resultMap="CmsPageResult">
+        <include refid="selectPageVo" />
+        <where>
+            <if test="slug != null and slug != ''">AND slug like concat('%', #{slug}, '%')</if>
+            <if test="title != null and title != ''">AND title like concat('%', #{title}, '%')</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        order by page_id asc
+    </select>
+
+    <select id="selectPageById" parameterType="Long" resultMap="CmsPageResult">
+        <include refid="selectPageVo" />
+        where page_id = #{pageId}
+    </select>
+
+    <select id="selectPageBySlug" parameterType="String" resultMap="CmsPageResult">
+        <include refid="selectPageVo" />
+        where slug = #{slug} and status = '0' limit 1
+    </select>
+
+    <select id="selectPageBySlugAny" parameterType="String" resultMap="CmsPageResult">
+        <include refid="selectPageVo" />
+        where slug = #{slug} limit 1
+    </select>
+
+    <insert id="insertPage" parameterType="CmsPage" useGeneratedKeys="true" keyProperty="pageId">
+        insert into cms_page
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="slug != null">slug,</if>
+            <if test="title != null">title,</if>
+            <if test="blocks != null">blocks,</if>
+            <if test="status != null">status,</if>
+            <if test="seoTitle != null">seo_title,</if>
+            <if test="seoKeywords != null">seo_keywords,</if>
+            <if test="seoDescription != null">seo_description,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="slug != null">#{slug},</if>
+            <if test="title != null">#{title},</if>
+            <if test="blocks != null">#{blocks},</if>
+            <if test="status != null">#{status},</if>
+            <if test="seoTitle != null">#{seoTitle},</if>
+            <if test="seoKeywords != null">#{seoKeywords},</if>
+            <if test="seoDescription != null">#{seoDescription},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updatePage" parameterType="CmsPage">
+        update cms_page
+        <set>
+            <if test="slug != null">slug = #{slug},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="blocks != null">blocks = #{blocks},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="seoTitle != null">seo_title = #{seoTitle},</if>
+            <if test="seoKeywords != null">seo_keywords = #{seoKeywords},</if>
+            <if test="seoDescription != null">seo_description = #{seoDescription},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where page_id = #{pageId}
+    </update>
+
+    <delete id="deletePageByIds" parameterType="Long">
+        delete from cms_page where page_id in
+        <foreach item="pageId" collection="array" open="(" separator="," close=")">
+            #{pageId}
+        </foreach>
+    </delete>
+
+</mapper>

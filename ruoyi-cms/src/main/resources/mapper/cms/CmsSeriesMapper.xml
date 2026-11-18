@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsSeriesMapper">
+
+    <resultMap type="CmsSeries" id="CmsSeriesResult">
+        <id property="seriesId" column="series_id" />
+        <result property="categoryId" column="category_id" />
+        <result property="name" column="name" />
+        <result property="subtitle" column="subtitle" />
+        <result property="cover" column="cover" />
+        <result property="sort" column="sort" />
+        <result property="status" column="status" />
+        <result property="delFlag" column="del_flag" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectSeriesVo">
+        select series_id, category_id, name, subtitle, cover, sort, status, del_flag,
+               create_by, create_time, update_by, update_time, remark
+        from cms_series
+    </sql>
+
+    <select id="selectSeriesList" parameterType="CmsSeries" resultMap="CmsSeriesResult">
+        <include refid="selectSeriesVo" />
+        <where>
+            del_flag = '0'
+            <if test="name != null and name != ''">AND name like concat('%', #{name}, '%')</if>
+            <if test="categoryId != null">AND category_id = #{categoryId}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        order by sort asc, series_id asc
+    </select>
+
+    <select id="selectSeriesById" parameterType="Long" resultMap="CmsSeriesResult">
+        <include refid="selectSeriesVo" />
+        where series_id = #{seriesId} and del_flag = '0'
+    </select>
+
+    <insert id="insertSeries" parameterType="CmsSeries" useGeneratedKeys="true" keyProperty="seriesId">
+        insert into cms_series
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">category_id,</if>
+            <if test="name != null">name,</if>
+            <if test="subtitle != null">subtitle,</if>
+            <if test="cover != null">cover,</if>
+            <if test="sort != null">sort,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="subtitle != null">#{subtitle},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateSeries" parameterType="CmsSeries">
+        update cms_series
+        <set>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="subtitle != null">subtitle = #{subtitle},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where series_id = #{seriesId}
+    </update>
+
+    <update id="deleteSeriesByIds" parameterType="Long">
+        update cms_series set del_flag = '2' where series_id in
+        <foreach item="seriesId" collection="array" open="(" separator="," close=")">
+            #{seriesId}
+        </foreach>
+    </update>
+
+</mapper>

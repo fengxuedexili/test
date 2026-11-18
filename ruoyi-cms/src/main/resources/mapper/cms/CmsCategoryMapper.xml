@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsCategoryMapper">
+
+    <resultMap type="CmsCategory" id="CmsCategoryResult">
+        <id property="categoryId" column="category_id" />
+        <result property="parentId" column="parent_id" />
+        <result property="name" column="name" />
+        <result property="slug" column="slug" />
+        <result property="type" column="type" />
+        <result property="cover" column="cover" />
+        <result property="summary" column="summary" />
+        <result property="sort" column="sort" />
+        <result property="seoTitle" column="seo_title" />
+        <result property="seoKeywords" column="seo_keywords" />
+        <result property="seoDescription" column="seo_description" />
+        <result property="status" column="status" />
+        <result property="delFlag" column="del_flag" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectCategoryVo">
+        select category_id, parent_id, name, slug, type, cover, summary, sort,
+               seo_title, seo_keywords, seo_description, status, del_flag,
+               create_by, create_time, update_by, update_time, remark
+        from cms_category
+    </sql>
+
+    <select id="selectCategoryList" parameterType="CmsCategory" resultMap="CmsCategoryResult">
+        <include refid="selectCategoryVo" />
+        <where>
+            del_flag = '0'
+            <if test="name != null and name != ''">AND name like concat('%', #{name}, '%')</if>
+            <if test="slug != null and slug != ''">AND slug = #{slug}</if>
+            <if test="type != null and type != ''">AND type = #{type}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+            <if test="parentId != null">AND parent_id = #{parentId}</if>
+        </where>
+        order by parent_id asc, sort asc, category_id asc
+    </select>
+
+    <select id="selectCategoryById" parameterType="Long" resultMap="CmsCategoryResult">
+        <include refid="selectCategoryVo" />
+        where category_id = #{categoryId} and del_flag = '0'
+    </select>
+
+    <select id="checkSlugUnique" parameterType="String" resultMap="CmsCategoryResult">
+        <include refid="selectCategoryVo" />
+        where slug = #{slug} and del_flag = '0' limit 1
+    </select>
+
+    <insert id="insertCategory" parameterType="CmsCategory" useGeneratedKeys="true" keyProperty="categoryId">
+        insert into cms_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">parent_id,</if>
+            <if test="name != null">name,</if>
+            <if test="slug != null">slug,</if>
+            <if test="type != null">type,</if>
+            <if test="cover != null">cover,</if>
+            <if test="summary != null">summary,</if>
+            <if test="sort != null">sort,</if>
+            <if test="seoTitle != null">seo_title,</if>
+            <if test="seoKeywords != null">seo_keywords,</if>
+            <if test="seoDescription != null">seo_description,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentId != null">#{parentId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="slug != null">#{slug},</if>
+            <if test="type != null">#{type},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="summary != null">#{summary},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="seoTitle != null">#{seoTitle},</if>
+            <if test="seoKeywords != null">#{seoKeywords},</if>
+            <if test="seoDescription != null">#{seoDescription},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCategory" parameterType="CmsCategory">
+        update cms_category
+        <set>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="slug != null">slug = #{slug},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="seoTitle != null">seo_title = #{seoTitle},</if>
+            <if test="seoKeywords != null">seo_keywords = #{seoKeywords},</if>
+            <if test="seoDescription != null">seo_description = #{seoDescription},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where category_id = #{categoryId}
+    </update>
+
+    <update id="deleteCategoryByIds" parameterType="Long">
+        update cms_category set del_flag = '2' where category_id in
+        <foreach item="categoryId" collection="array" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </update>
+
+    <select id="countChildren" parameterType="Long" resultType="int">
+        select count(1) from cms_category where parent_id = #{parentId} and del_flag = '0'
+    </select>
+
+</mapper>

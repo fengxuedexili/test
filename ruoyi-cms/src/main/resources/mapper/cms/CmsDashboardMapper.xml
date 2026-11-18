@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.cms.mapper.CmsDashboardMapper">
+
+    <resultMap type="CmsLead" id="DashboardLeadResult">
+        <id property="leadId" column="lead_id" />
+        <result property="type" column="type" />
+        <result property="name" column="name" />
+        <result property="phone" column="phone" />
+        <result property="province" column="province" />
+        <result property="city" column="city" />
+        <result property="status" column="status" />
+        <result property="handler" column="handler" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <resultMap type="CmsArticle" id="DashboardArticleResult">
+        <id property="articleId" column="article_id" />
+        <result property="categoryId" column="category_id" />
+        <result property="title" column="title" />
+        <result property="cover" column="cover" />
+        <result property="summary" column="summary" />
+        <result property="isTop" column="is_top" />
+        <result property="publishTime" column="publish_time" />
+        <result property="status" column="status" />
+        <result property="viewCount" column="view_count" />
+    </resultMap>
+
+    <select id="countProducts" resultType="long">
+        select count(1) from cms_product where del_flag = '0'
+    </select>
+
+    <select id="countPublishedArticles" resultType="long">
+        select count(1) from cms_article where del_flag = '0' and status = '0'
+    </select>
+
+    <select id="countPendingLeads" resultType="long">
+        select count(1) from cms_lead where status = '0'
+    </select>
+
+    <select id="countTodayLeads" resultType="long">
+        select count(1) from cms_lead where create_time &gt;= curdate()
+    </select>
+
+    <select id="countActiveStores" resultType="long">
+        select count(1) from cms_store where del_flag = '0' and status = '0'
+    </select>
+
+    <select id="countActivePages" resultType="long">
+        select count(1) from cms_page where status = '0'
+    </select>
+
+    <select id="selectRecentLeads" resultMap="DashboardLeadResult">
+        select lead_id, type, name, phone, province, city, status, handler, create_time
+        from cms_lead
+        order by lead_id desc
+        limit #{limit}
+    </select>
+
+    <select id="selectLatestArticles" resultMap="DashboardArticleResult">
+        select article_id, category_id, title, cover, summary, is_top, publish_time, status, view_count
+        from cms_article
+        where del_flag = '0' and status = '0'
+        order by is_top desc, publish_time desc, article_id desc
+        limit #{limit}
+    </select>
+
+    <select id="selectLeadTrend" resultType="java.util.HashMap">
+        select date_format(create_time, '%m-%d') as d, count(1) as c
+        from cms_lead
+        where create_time &gt;= date_sub(curdate(), interval 6 day)
+        group by date_format(create_time, '%m-%d')
+        order by d asc
+    </select>
+
+</mapper>

@@ -1,0 +1,70 @@
+# =====================================================================
+# 生产环境覆盖（启动参数：--spring.profiles.active=prod,druid）
+# 所有敏感项通过环境变量注入，参考 deploy/env.example.*
+# =====================================================================
+server:
+  port: ${SITE_SERVER_PORT:8080}
+  tomcat:
+    # 生产适当收敛线程，按 CPU/内存再调
+    threads:
+      max: 400
+      min-spare: 50
+
+ruoyi:
+  # 上传目录（必须可写、独立于 jar，便于备份）
+  profile: ${SITE_UPLOAD_PATH:/data/site/uploadPath}
+  # 生产建议开启 IP 归属解析（需外网可达 ip2region 服务时）
+  addressEnabled: false
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+  datasource:
+    druid:
+      master:
+        url: jdbc:mysql://${SITE_DB_HOST:127.0.0.1}:${SITE_DB_PORT:3306}/${SITE_DB_NAME:site}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+        username: ${SITE_DB_USERNAME:site}
+      # 关闭 Druid 监控台（静态资源仍映射，但 servlet 不再注册）
+      statViewServlet:
+        enabled: false
+      webStatFilter:
+        enabled: false
+  data:
+    redis:
+      host: ${SITE_REDIS_HOST:127.0.0.1}
+      port: ${SITE_REDIS_PORT:6379}
+      password: ${SITE_REDIS_PASSWORD:}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+# 生产必须显式提供 JWT 密钥；缺失则启动失败（fail-fast）
+token:
+  secret: ${SITE_TOKEN_SECRET}
+  expireTime: 120
+
+# 关闭在线接口文档
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# 防盗链：RuoYi 的 RefererFilter 会拒绝无 Referer 的请求（含健康检查/脚本），默认关闭；
+# 如需启用，确认所有入口（浏览器页面）都会携带 Referer，并配置正式域名
+referer:
+  enabled: false
+  allowed-domains: ${SITE_ALLOWED_DOMAINS:www.example.com}
+
+# 跨域：仅允许正式站点域名（逗号分隔）
+cors:
+  allowed-origins: ${SITE_CORS_ORIGINS:https://www.example.com}
+
+logging:
+  level:
+    com.ruoyi: info
+    org.springframework: warn
+  file:
+    name: ${SITE_LOG_PATH:/data/site/logs}/site.log

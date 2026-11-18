@@ -1,0 +1,27 @@
+# /etc/systemd/system/site-server.service
+# systemctl daemon-reload && systemctl enable --now site-server
+[Unit]
+Description=site official website backend (Spring Boot)
+After=network.target mysqld.service redis.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/data/site
+EnvironmentFile=/etc/site/site.env
+ExecStart=/usr/bin/java -Xms512m -Xmx1024m -jar /data/site/site-server.jar
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65535
+# 安全加固（视系统能力启用）
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/data/site /data/site/uploadPath /data/site/logs
+
+[Install]
+WantedBy=multi-user.target

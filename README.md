@@ -32,7 +32,7 @@
 | **官网前台 `site-web`** | ✅ Vue3 + Vite6 + Vuex，80；首页/产品/资讯/门店/预约/单页；`npm run build` 通过 |
 | 安全基线 | ✅ 去掉了 demo 的匿名上传/越权白名单；DB 密码与 JWT secret 支持环境变量覆盖 |
 | 图片/上传链路 | ✅ 上传目录改为项目根 `uploadPath`（`SITE_UPLOAD_PATH` 可覆盖）；路径反斜杠归一；前台/后台代理 `/profile` |
-| **M1 上线准备** | ✅ Git 初始化（`main` + `v0.1.0`）；`application-prod.yml`（关 Swagger/Druid、JWT fail-fast）；Nginx/systemd/env 模板；CORS 可配置；一键冒烟（29 项） |
+| **M1 上线准备** | ✅ Git（`1af3392` / `v0.1.0`）；`application-prod.yml`（关 Swagger/Druid、JWT fail-fast）；Nginx/systemd/env 模板；CORS 可配置；一键冒烟（29 项） |
 | 上线待办（OSS / 域名证书 / 地图 / 预渲染） | ⏳ 需外部资源或单独排期 |
 
 ## 2. 目录结构

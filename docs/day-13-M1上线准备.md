@@ -6,7 +6,7 @@
 
 | 类别 | 文件 | 说明 |
 |---|---|---|
-| Git | `.git/`、`.gitignore` | 首次初始化，`main` 分支，首个提交与 `v0.1.0` 标签 |
+| Git | `.git/`、`.gitignore`、`.gitattributes` | 首次初始化 `main`，提交 `1af3392`（793 个文件），标签 `v0.1.0`；行尾按平台规范 |
 | 生产配置 | `ruoyi-admin/src/main/resources/application-prod.yml` | 端口/上传/日志/DB/Redis 环境变量化；关闭 Swagger 与 Druid 控制台；JWT 密钥 fail-fast |
 | 框架改造 | `ResourcesConfig.java`、`application.yml` | CORS 来源由硬编码 `*` 改为 `cors.allowed-origins`（默认 `*`，生产用 `SITE_CORS_ORIGINS`） |
 | 日志 | `logback.xml` | 日志目录支持 `SITE_LOG_PATH`，默认 `./logs` |
@@ -77,6 +77,8 @@
 | 8 | 验证码恢复 | 未带验证码登录返回「验证码已失效」 |
 | 9 | 常规冒烟（验证码开启，`-SkipAdmin`） | **PASS 17 / FAIL 0 / WARN 0**，exit 0 |
 | 10 | 日志文件命名 | 增加毫秒，连续运行不再互相覆盖 |
+| 11 | Git | `main` 分支，提交 `1af3392`（793 文件，无 target/dist/node_modules/logs/uploadPath），标签 `v0.1.0`，工作区干净 |
+| 12 | 密钥扫描 | `git grep` 未发现数据库密码；`deploy/env.example` 仅 `CHANGE_ME` 占位 |
 
 ## 6. 发布与回滚（摘要，详见 `deploy/README.md`）
 

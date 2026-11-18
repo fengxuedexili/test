@@ -244,3 +244,4 @@ bin\dev-admin.bat                   # 后台 5174
 | `docs\day-13-M1上线准备.md` | Day 13：Git / 生产配置 / Nginx / 安全自检 / 冒烟 |
 | `deploy\README.md` | 生产部署手册（环境变量、systemd、Nginx、发布回滚） |
 | `git.md` | Git 当前状态、远端选择、推送指令与日常流程 |
+| `阶段性总结.md` | 阶段性总结：范围、功能、设计、验证、风险与下一阶段 |

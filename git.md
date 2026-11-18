@@ -7,8 +7,8 @@
 | 仓库位置 | `D:\VUE-WorkSpace\2027\site`（本地） |
 | 远端 | **origin** → `https://github.com/fengxuedexili/test.git` |
 | 分支 | `main`（跟踪 `origin/main`） |
-| 本地 HEAD | `fde2ee2` docs: 增加 Git 状态与推送指南 |
-| 远端 HEAD | `fde2ee2`（与本地一致） |
+| 本地/远端 | 已同步（`git log -1`、`git status` 核对最新状态） |
+| 关键提交 | `1af3392` 初始化工程（tag `v0.1.0`）；`6f8970d`、`fde2ee2` 等文档提交 |
 | 标签 | `v0.1.0`（已推送，指向 `1af3392`） |
 | 工作区 | clean |
 | 跟踪文件 | 793 个（无 `target/dist/node_modules/logs/uploadPath`） |
